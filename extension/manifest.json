@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Transcription",
+  "version": "1.0",
+  "description": "Transcrit les vidéos YouTube avec Gladia",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.youtube.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/@*/videos"],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ],
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+} 
