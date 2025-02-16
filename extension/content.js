@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://youtube-transcribe-backend.onrender.com/api';
+const BACKEND_URL = 'https://extension-youtube-transcribe.onrender.com/api';
 
 class TranscriptionButton {
   constructor(videoElement) {

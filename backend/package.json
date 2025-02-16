@@ -6,18 +6,22 @@
   "type": "module",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "dev": "nodemon src/app.js",
+    "postinstall": "chmod +x install-yt-dlp.sh && ./install-yt-dlp.sh"
   },
   "dependencies": {
     "express": "^4.18.2",
     "dotenv": "^16.0.3",
     "cors": "^2.8.5",
     "googleapis": "^118.0.0",
-    "yt-dlp-exec": "^1.1.2",
+    "yt-dlp-exec": "^1.0.2",
     "node-fetch": "^3.3.1",
     "form-data": "^4.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 } 

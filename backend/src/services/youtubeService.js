@@ -2,7 +2,10 @@ import ytdlp from 'yt-dlp-exec';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 
+const execAsync = promisify(exec);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMP_DIR = path.join(__dirname, '../../temp');
 
@@ -21,12 +24,12 @@ const youtubeService = {
     
     const url = `https://www.youtube.com/watch?v=${videoId}`;
     
-    await ytdlp(url, {
-      extractAudio: true,
-      audioFormat: 'mp3',
-      output: outputPath,
-      maxFilesize: '100M'
-    });
+    try {
+      await execAsync(`yt-dlp -x --audio-format mp3 -o "${outputPath}" ${url}`);
+    } catch (error) {
+      console.error('Erreur lors du téléchargement:', error);
+      throw new Error('Erreur lors du téléchargement de la vidéo');
+    }
 
     return outputPath;
   },
