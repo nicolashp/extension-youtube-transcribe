@@ -8,8 +8,6 @@ export default {
     credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS || '{}')
   },
   allowedOrigins: [
-    'https://www.youtube.com',
-    'http://localhost:3000',
-    'chrome-extension://*'
+    '*'  // Autoriser toutes les origines temporairement pour le débogage
   ]
 }; 

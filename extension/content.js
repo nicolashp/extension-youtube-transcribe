@@ -89,12 +89,14 @@ class TranscriptionButton {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Origin': window.location.origin,
-          'Accept': 'application/json'
         },
-        credentials: 'include',
+        mode: 'cors',
         body: JSON.stringify({ videoId: this.videoId })
       });
+
+      if (response.status === 502) {
+        throw new Error('Le serveur est temporairement indisponible. Veuillez réessayer.');
+      }
 
       const data = await response.json();
 

@@ -28,16 +28,13 @@ const youtubeService = {
     try {
       const command = [
         YT_DLP_PATH,
-        '--format', 'bestaudio',
+        '--format', 'worstaudio',
         '--extract-audio',
         '--audio-format', 'mp3',
-        '--audio-quality', '0',
-        '--cookies-from-browser', 'chrome',
+        '--audio-quality', '9',
         '--no-warnings',
         '--force-ipv4',
-        '--geo-bypass',
-        '--ignore-errors',
-        '--no-playlist',
+        '--no-check-certificate',
         '-o', `"${outputPath}"`,
         `"${url}"`
       ].join(' ');

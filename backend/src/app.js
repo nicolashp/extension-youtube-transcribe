@@ -10,13 +10,16 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors({
-  origin: config.allowedOrigins,
-  methods: ['POST', 'GET', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  maxAge: 86400 // 24 heures
-}));
+app.use(cors());
+
+// Middleware pour les en-têtes CORS
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Max-Age', '86400');
+  next();
+});
 
 app.use(express.json());
 
@@ -28,15 +31,6 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Une erreur est survenue!' });
 });
-
-// Options preflight pour CORS
-app.options('*', cors({
-  origin: config.allowedOrigins,
-  methods: ['POST', 'GET', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  maxAge: 86400
-}));
 
 app.listen(PORT, () => {
   console.log(`Serveur démarré sur le port ${PORT}`);
