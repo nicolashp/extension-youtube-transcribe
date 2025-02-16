@@ -26,23 +26,29 @@ const youtubeService = {
     const url = `https://www.youtube.com/watch?v=${videoId}`;
     
     try {
-      // Commande optimisée pour éviter l'authentification
       const command = [
         YT_DLP_PATH,
-        '--format', 'bestaudio[ext=m4a]',
+        '--format', 'bestaudio',
         '--extract-audio',
         '--audio-format', 'mp3',
         '--audio-quality', '0',
-        '--no-check-certificates',
+        '--cookies-from-browser', 'chrome',
         '--no-warnings',
+        '--force-ipv4',
+        '--geo-bypass',
+        '--ignore-errors',
+        '--no-playlist',
         '-o', `"${outputPath}"`,
         `"${url}"`
       ].join(' ');
       
+      console.log('Exécution de la commande:', command);
       await execAsync(command);
       return outputPath;
     } catch (error) {
       console.error('Erreur lors du téléchargement:', error);
+      if (error.stderr) console.error('Stderr:', error.stderr);
+      if (error.stdout) console.error('Stdout:', error.stdout);
       throw new Error('Erreur lors du téléchargement de la vidéo');
     }
   },
