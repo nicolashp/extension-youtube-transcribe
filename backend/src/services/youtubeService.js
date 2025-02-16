@@ -14,10 +14,18 @@ const COOKIES_PATH = path.join(TEMP_DIR, 'cookies.txt');
 
 // Cookies YouTube minimaux nécessaires
 const YOUTUBE_COOKIES = `# Netscape HTTP Cookie File
-.youtube.com	TRUE	/	TRUE	2597573456	CONSENT	YES+cb.20231213-07-p0.fr+FX+733
-.youtube.com	TRUE	/	TRUE	2597573456	GPS	1
-.youtube.com	TRUE	/	TRUE	2597573456	VISITOR_INFO1_LIVE	anon
-.youtube.com	TRUE	/	TRUE	2597573456	YSC	anon`;
+.youtube.com	TRUE	/	TRUE	2597573456	CONSENT	PENDING+355
+.youtube.com	TRUE	/	TRUE	2597573456	VISITOR_INFO1_LIVE	6_ZpwFLxC8A
+.youtube.com	TRUE	/	TRUE	2597573456	LOGIN_INFO	AFmmF2swRQIhANPZr0lFZKHYqEX9_bHN_bzOYL_QWqwZ3lmZYUBB2KVoAiB2Yf6k3JwTgf0cU8QKtVoCG-0RgfrM6gQHVe-SD-B-Zg:QUQ3MjNmd3VnMmJYVEF5SGhGYjBVZmJVTnBQbUNqNWJLbHhqQUhkcWlDTjVsNHBJLWFKY0lQUmFXQnJRYjBhRmhvUjVyTHJBY0lQRmRyTXBKSHVhZmFVdnVUUHZxUGFyTmVGRmRJZnZQbmFLbVBfRnVhWnVHRnJxTnVhVnVLbmxBTXBxWVBfRHhzRnBkTmxBbmFVWHJfRHhYbWRR
+.youtube.com	TRUE	/	TRUE	2597573456	SID	ZQjWZU-xLqwXw3c3Bv0taTkxNJeEhAVX3_bJ3wJj2QPTWYBBpwJ-UZgHHtylgWF9FHDqQA.
+.youtube.com	TRUE	/	TRUE	2597573456	__Secure-1PSID	ZQjWZU-xLqwXw3c3Bv0taTkxNJeEhAVX3_bJ3wJj2QPTWYBBJfKqgYvHHtylgWF9FHDqQA.
+.youtube.com	TRUE	/	TRUE	2597573456	__Secure-3PSID	ZQjWZU-xLqwXw3c3Bv0taTkxNJeEhAVX3_bJ3wJj2QPTWYBBCc8yF9THHtylgWF9FHDqQA.
+.youtube.com	TRUE	/	TRUE	2597573456	HSID	AKHr8rLqL8_KV9Z7d
+.youtube.com	TRUE	/	TRUE	2597573456	SSID	A5_z8r9XLZ3qL8_Kd
+.youtube.com	TRUE	/	TRUE	2597573456	APISID	TJ9_z8r9XLZ3qL8_K/A5_z8rLqL8_KV9Z7
+.youtube.com	TRUE	/	TRUE	2597573456	SAPISID	TJ9_z8r9XLZ3qL8_K/A5_z8rLqL8_KV9Z7
+.youtube.com	TRUE	/	TRUE	2597573456	__Secure-1PAPISID	TJ9_z8r9XLZ3qL8_K/A5_z8rLqL8_KV9Z7
+.youtube.com	TRUE	/	TRUE	2597573456	__Secure-3PAPISID	TJ9_z8r9XLZ3qL8_K/A5_z8rLqL8_KV9Z7`;
 
 const youtubeService = {
   async ensureTempDir() {
@@ -49,13 +57,18 @@ const youtubeService = {
       const userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
       const command = [
         YT_DLP_PATH,
-        '--format', 'm4a/bestaudio/best',
+        '--format', 'bestaudio[ext=m4a]',
         '--extract-audio',
         '--audio-format', 'mp3',
         '--no-warnings',
+        '--no-check-certificate',
+        '--geo-bypass',
+        '--add-header', `'Referer: https://www.youtube.com'`,
+        '--add-header', `'Origin: https://www.youtube.com'`,
         '--no-playlist',
         '--user-agent', `'${userAgent}'`,
         '--cookies', `'${cookiesPath}'`,
+        '--extractor-args', `'youtube:player_client=android'`,
         '-o', `'${outputPath}'`,
         `'${url}'`
       ].join(' ');
