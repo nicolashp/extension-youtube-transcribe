@@ -26,6 +26,7 @@ const youtubeService = {
     const url = `https://www.youtube.com/watch?v=${videoId}`;
     
     try {
+      const userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
       const command = [
         YT_DLP_PATH,
         '--format', 'm4a/bestaudio/best',
@@ -37,9 +38,9 @@ const youtubeService = {
         '--no-cache-dir',
         '--rm-cache-dir',
         '--no-playlist',
-        '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        '-o', `"${outputPath}"`,
-        `"${url}"`
+        '--user-agent', `'${userAgent}'`,
+        '-o', `'${outputPath}'`,
+        `'${url}'`
       ].join(' ');
       
       console.log('Exécution de la commande:', command);
@@ -51,6 +52,8 @@ const youtubeService = {
       return outputPath;
     } catch (error) {
       console.error('Erreur lors de l\'exécution de yt-dlp:', error);
+      if (error.stderr) console.error('Stderr:', error.stderr);
+      if (error.stdout) console.error('Stdout:', error.stdout);
       throw error;
     }
   },
