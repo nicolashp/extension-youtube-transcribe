@@ -9,11 +9,54 @@ class TranscriptionButton {
   }
 
   extractVideoId() {
-    const thumbnail = this.videoElement.querySelector('#thumbnail');
-    if (thumbnail) {
-      const href = thumbnail.getAttribute('href');
-      return href.split('=')[1];
+    // Essayer d'abord de trouver l'ID via l'attribut video-id
+    const videoIdAttr = this.videoElement.querySelector('[href*="watch?v="]');
+    if (videoIdAttr) {
+      const href = videoIdAttr.getAttribute('href');
+      const match = href.match(/[?&]v=([^&]+)/);
+      if (match) {
+        return match[1];
+      }
     }
+
+    // Essayer de trouver via le lien de la miniature
+    const thumbnailLink = this.videoElement.querySelector('a#thumbnail[href], a#video-title-link[href]');
+    if (thumbnailLink) {
+      const href = thumbnailLink.getAttribute('href');
+      if (href) {
+        // Format: ?v=VIDEO_ID
+        const vMatch = href.match(/[?&]v=([^&]+)/);
+        if (vMatch) {
+          return vMatch[1];
+        }
+        
+        // Format: /watch/VIDEO_ID
+        const watchMatch = href.match(/\/watch\/([^/?]+)/);
+        if (watchMatch) {
+          return watchMatch[1];
+        }
+        
+        // Format: /video/VIDEO_ID
+        const videoMatch = href.match(/\/video\/([^/?]+)/);
+        if (videoMatch) {
+          return videoMatch[1];
+        }
+      }
+    }
+
+    // Essayer de trouver via l'URL de la miniature
+    const thumbnailImg = this.videoElement.querySelector('img.yt-core-image');
+    if (thumbnailImg) {
+      const src = thumbnailImg.getAttribute('src') || thumbnailImg.getAttribute('data-thumb');
+      if (src) {
+        const match = src.match(/\/vi\/([^/]+)\//);
+        if (match) {
+          return match[1];
+        }
+      }
+    }
+
+    console.error('Could not find video ID');
     return null;
   }
 
@@ -46,7 +89,10 @@ class TranscriptionButton {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Origin': window.location.origin,
+          'Accept': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({ videoId: this.videoId })
       });
 
@@ -71,7 +117,7 @@ class TranscriptionButton {
   }
 
   inject() {
-    const titleElement = this.videoElement.querySelector('#video-title');
+    const titleElement = this.videoElement.querySelector('#video-title, #video-title-link');
     if (titleElement) {
       titleElement.parentNode.insertBefore(this.button, titleElement.nextSibling);
       titleElement.parentNode.insertBefore(this.status, this.button.nextSibling);
@@ -80,19 +126,34 @@ class TranscriptionButton {
 }
 
 function initializeTranscriptionButtons() {
-  const videoElements = document.querySelectorAll('ytd-rich-grid-media');
+  // Sélecteur plus spécifique pour les éléments vidéo
+  const videoElements = document.querySelectorAll('ytd-rich-grid-media, ytd-grid-video-renderer');
   videoElements.forEach(videoElement => {
-    const button = new TranscriptionButton(videoElement);
-    button.inject();
+    // Vérifier si l'élément a déjà un bouton
+    if (!videoElement.querySelector('.transcribe-button')) {
+      const button = new TranscriptionButton(videoElement);
+      button.inject();
+    }
   });
 }
 
-// Observer pour les chargements dynamiques
+// Améliorer l'observer pour éviter les doublons
 const observer = new MutationObserver((mutations) => {
+  let shouldInit = false;
   for (const mutation of mutations) {
     if (mutation.addedNodes.length) {
-      initializeTranscriptionButtons();
+      const hasNewVideos = Array.from(mutation.addedNodes).some(node => 
+        node.nodeName === 'YTD-RICH-GRID-MEDIA' || 
+        node.nodeName === 'YTD-GRID-VIDEO-RENDERER'
+      );
+      if (hasNewVideos) {
+        shouldInit = true;
+        break;
+      }
     }
+  }
+  if (shouldInit) {
+    initializeTranscriptionButtons();
   }
 });
 
@@ -101,5 +162,9 @@ observer.observe(document.body, {
   subtree: true
 });
 
-// Initialisation initiale
-initializeTranscriptionButtons(); 
+// Attendre que la page soit complètement chargée
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeTranscriptionButtons);
+} else {
+  initializeTranscriptionButtons();
+} 

@@ -12,7 +12,13 @@
   ],
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/@*/videos"],
+      "matches": [
+        "https://www.youtube.com/@*/videos",
+        "https://www.youtube.com/c/*/videos",
+        "https://www.youtube.com/channel/*/videos",
+        "https://www.youtube.com/user/*/videos",
+        "https://www.youtube.com/*"
+      ],
       "js": ["content.js"],
       "css": ["styles.css"]
     }
