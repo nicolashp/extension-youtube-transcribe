@@ -28,25 +28,30 @@ const youtubeService = {
     try {
       const command = [
         YT_DLP_PATH,
-        '--format', 'worstaudio',
+        '--format', 'm4a/bestaudio/best',
         '--extract-audio',
         '--audio-format', 'mp3',
-        '--audio-quality', '9',
         '--no-warnings',
-        '--force-ipv4',
         '--no-check-certificate',
+        '--prefer-insecure',
+        '--no-cache-dir',
+        '--rm-cache-dir',
+        '--no-playlist',
+        '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         '-o', `"${outputPath}"`,
         `"${url}"`
       ].join(' ');
       
       console.log('Exécution de la commande:', command);
       await execAsync(command);
+      const stats = await fs.stat(outputPath);
+      if (stats.size === 0) {
+        throw new Error('Le fichier téléchargé est vide');
+      }
       return outputPath;
     } catch (error) {
-      console.error('Erreur lors du téléchargement:', error);
-      if (error.stderr) console.error('Stderr:', error.stderr);
-      if (error.stdout) console.error('Stdout:', error.stdout);
-      throw new Error('Erreur lors du téléchargement de la vidéo');
+      console.error('Erreur lors de l\'exécution de yt-dlp:', error);
+      throw error;
     }
   },
 
