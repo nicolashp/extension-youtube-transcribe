@@ -8,6 +8,7 @@ import { promisify } from 'util';
 const execAsync = promisify(exec);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMP_DIR = path.join(__dirname, '../../temp');
+const YT_DLP_PATH = path.join(__dirname, '../../bin/yt-dlp');
 
 const youtubeService = {
   async ensureTempDir() {
@@ -25,7 +26,7 @@ const youtubeService = {
     const url = `https://www.youtube.com/watch?v=${videoId}`;
     
     try {
-      await execAsync(`yt-dlp -x --audio-format mp3 -o "${outputPath}" ${url}`);
+      await execAsync(`${YT_DLP_PATH} -x --audio-format mp3 -o "${outputPath}" ${url}`);
     } catch (error) {
       console.error('Erreur lors du téléchargement:', error);
       throw new Error('Erreur lors du téléchargement de la vidéo');

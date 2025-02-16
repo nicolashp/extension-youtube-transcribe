@@ -2,7 +2,10 @@ services:
   - type: web
     name: extension-youtube-transcribe
     env: node
-    buildCommand: cd backend && npm install
+    buildCommand: |
+      cd backend
+      mkdir -p temp
+      npm install
     startCommand: cd backend && npm start
     envVars:
       - key: NODE_VERSION
