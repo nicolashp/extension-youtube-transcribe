@@ -3,8 +3,20 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import transcriptionRoutes from './routes/transcriptionRoutes.js';
 import config from './config/config.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-dotenv.config();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Charger les variables d'environnement depuis le fichier .env
+dotenv.config({ 
+  path: path.join(__dirname, '../.env'),
+  debug: true
+});
+
+// Vérifier que les variables sont chargées
+console.log('Variables d\'environnement chargées:');
+console.log('GROQ_API_KEY:', process.env.GROQ_API_KEY);
 
 const app = express();
 const PORT = process.env.PORT || 3000;

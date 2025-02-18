@@ -10,8 +10,13 @@
   transition: background-color 0.2s;
 }
 
+.transcribe-button:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+}
+
 .transcribe-button:hover {
-  background-color: #cc0000;
+  background-color: var(--hover-color, #cc0000);
 }
 
 .transcribe-button.loading {

@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://extension-youtube-transcribe.onrender.com/api';
+const BACKEND_URL = 'http://localhost:3000/api';
 
 class TranscriptionButton {
   constructor(videoElement) {
@@ -6,6 +6,7 @@ class TranscriptionButton {
     this.videoId = this.extractVideoId();
     this.button = this.createButton();
     this.status = this.createStatus();
+    this.checkTranscriptionStatus();
   }
 
   extractVideoId() {
@@ -63,8 +64,9 @@ class TranscriptionButton {
   createButton() {
     const button = document.createElement('button');
     button.className = 'transcribe-button';
-    button.textContent = 'Transcrire';
-    button.addEventListener('click', () => this.handleTranscription());
+    button.textContent = 'Vérification...';
+    button.disabled = true;
+    button.onclick = () => this.handleTranscription();
     return button;
   }
 
@@ -110,6 +112,27 @@ class TranscriptionButton {
     } finally {
       this.button.disabled = false;
       this.button.classList.remove('loading');
+    }
+  }
+
+  async checkTranscriptionStatus() {
+    try {
+      const response = await fetch(`${BACKEND_URL}/transcription/status/${this.videoId}`);
+      const data = await response.json();
+      
+      if (data.isTranscribed) {
+        this.button.textContent = 'Déjà transcrit';
+        this.button.disabled = true;
+        this.button.style.backgroundColor = '#666';
+        this.updateStatus(`Transcription disponible`);
+      } else {
+        this.button.textContent = 'Transcrire';
+        this.button.disabled = false;
+      }
+    } catch (error) {
+      console.error('Erreur lors de la vérification du statut:', error);
+      this.button.textContent = 'Transcrire';
+      this.button.disabled = false;
     }
   }
 

@@ -5,29 +5,56 @@ const driveService = {
   async getAuthClient() {
     const auth = new google.auth.GoogleAuth({
       credentials: config.google.credentials,
-      scopes: ['https://www.googleapis.com/auth/drive.file']
+      scopes: [
+        'https://www.googleapis.com/auth/drive.file',
+        'https://www.googleapis.com/auth/documents'
+      ]
     });
     return auth.getClient();
   },
 
-  async saveTranscription(videoId, transcription) {
+  async saveTranscription(title, transcription) {
     const auth = await this.getAuthClient();
     const drive = google.drive({ version: 'v3', auth });
+    const docs = google.docs({ version: 'v1', auth });
 
     const fileMetadata = {
-      name: `Transcription-${videoId}.txt`,
-      parents: [config.google.folderId]
-    };
-
-    const media = {
-      mimeType: 'text/plain',
-      body: transcription
+      name: `Transcription - ${title}`,
+      parents: [config.google.folderId],
+      mimeType: 'application/vnd.google-apps.document'
     };
 
     const response = await drive.files.create({
       resource: fileMetadata,
-      media: media,
       fields: 'id, webViewLink'
+    });
+
+    await docs.documents.batchUpdate({
+      documentId: response.data.id,
+      requestBody: {
+        requests: [{
+          insertText: {
+            location: {
+              index: 1
+            },
+            text: transcription
+          }
+        }]
+      }
+    });
+
+    await docs.documents.batchUpdate({
+      documentId: response.data.id,
+      requestBody: {
+        requests: [{
+          insertText: {
+            location: {
+              index: 1
+            },
+            text: `Transcription de : ${title}\nDate : ${new Date().toLocaleDateString('fr-FR')}\n\n`
+          }
+        }]
+      }
     });
 
     return response.data.webViewLink;

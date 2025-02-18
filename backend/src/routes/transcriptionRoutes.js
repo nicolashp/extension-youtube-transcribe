@@ -1,6 +1,7 @@
 import express from 'express';
 import { transcribeVideo } from '../controllers/transcriptionController.js';
 import config from '../config/config.js';
+import sheetsService from '../services/sheetsService.js';
 
 const router = express.Router();
 
@@ -17,6 +18,19 @@ router.use((req, res, next) => {
   next();
 });
 
+// Route pour la transcription
 router.post('/transcribe', transcribeVideo);
+
+// Route pour vérifier le statut d'une transcription
+router.get('/transcription/status/:videoId', async (req, res) => {
+  try {
+    const { videoId } = req.params;
+    const isTranscribed = await sheetsService.isVideoTranscribed(videoId);
+    res.json({ isTranscribed });
+  } catch (error) {
+    console.error('Erreur lors de la vérification du statut:', error);
+    res.status(500).json({ error: 'Erreur lors de la vérification' });
+  }
+});
 
 export default router; 
